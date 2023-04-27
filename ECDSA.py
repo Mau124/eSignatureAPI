@@ -14,11 +14,11 @@ def genKeys():
     return(privateKey.toString(), publicKey.toString())
 
 # Generamos una firma 
-# Requiere la clave privada del usuario que firma y el archivo a firmar
+# Requiere la clave privada del usuario que firma y el contenido del archivo
+# a firmar
 def genSignature(userprivatekey, file):
     # Genera un digest del archivo usando SHA256
-    with open(file, 'rb') as f:
-        message = hashlib.sha256(f.read()).hexdigest()
+    message = hashlib.sha256(file).hexdigest()
 
     # Generamos la firma del documento usando el digest y la clave privada
     signature = Ecdsa.sign(message, PrivateKey.fromString(userprivatekey))
@@ -28,8 +28,7 @@ def genSignature(userprivatekey, file):
 
 def fileVerify(file, sign, publickey):
     # Generamos un digest del documento a verificar
-    with open(file, 'rb') as f:
-        message = hashlib.sha256(f.read()).hexdigest()
+    message = hashlib.sha256(file).hexdigest()
     
     print(Ecdsa.verify(message, 
                        Signature._fromString(sign), 

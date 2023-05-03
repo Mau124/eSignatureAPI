@@ -1,11 +1,14 @@
 import os
 
 from flask import Flask
+from . import routes
 
 def create_app(test_config = None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(SECRET_KEY='dev')
+    app.config.from_object(test_config)
+
+    app.register_blueprint(routes.blueprint)
 
     if test_config is None:
         # Load the instance config, if it exits, when not testing
@@ -19,10 +22,5 @@ def create_app(test_config = None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-
-    # a simple page to test
-    @app.route("/hello")
-    def hello():
-        return 'Hello, world!'
 
     return app

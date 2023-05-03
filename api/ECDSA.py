@@ -30,6 +30,6 @@ def fileVerify(file, sign, publickey):
     # Generamos un digest del documento a verificar
     message = hashlib.sha256(file).hexdigest()
     
-    print(Ecdsa.verify(message, 
-                       Signature._fromString(sign), 
-                       PublicKey.fromString(publickey)))
+    isSignatureEquals = Ecdsa.verify(message, Signature._fromString(sign), PublicKey.fromString(publickey))
+    
+    return isSignatureEquals

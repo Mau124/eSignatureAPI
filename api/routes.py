@@ -10,34 +10,43 @@ blueprint = Blueprint(
 
 @blueprint.get('/generateKey')
 def generateKey():
-    key = 'asdf'
-    return key
+    keys = ec.genKeys()
+    result = {'private_key': keys[0], 'public_key': keys[1]}
+    return result
 
-@blueprint.post('/generateSignature')
-def generateSignature():
-    # key = request.form['keys']
-    # file = request.form['file']
+@blueprint.get('/verify')
+def verifyFile():
     dirname = os.path.dirname(__file__)
     filename = os.path.join(dirname, '../tmp/test')
 
-    data = request.files
-    data2 = request.form
-    print(data)
-    print(data2)
-    file = data['file']
+    signature = request.form['signature']
+    public_key = request.form['public_key']
+    file = request.files['file']
     file.save(filename)
-    print(file)
+    
+    with open (filename, 'rb') as input_file:
+        message = input_file.read()
 
-    key = ec.genKeys()
+    os.remove(filename)
 
-    ifile = open(filename, 'rb')
-    input_file = ifile.read()
-    print(input_file)
-    print(key)
-    signature = ec.genSignature(key[0], input_file)
-    ifile.close()
+    result = {'result': ec.fileVerify(message, signature, public_key) }
 
-    # print(key)
-    # print(file)
+    return result
+
+@blueprint.get('/generateSignature')
+def generateSignature():
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, '../tmp/test')
+
+    private_key = request.form['private_key']
+    file = request.files['file']
+    file.save(filename)
+
+    with open (filename, 'rb') as input_file:
+        message = input_file.read()
+
+    os.remove(filename)
+
+    signature = ec.genSignature(private_key, message)
 
     return signature
